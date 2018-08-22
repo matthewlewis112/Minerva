@@ -19,5 +19,7 @@ class weather(intent):
         self.attributes = { "day" : time() }
 
     def parseString(self, str):
-        self.attributes["day"].parseString(str.lower().split(" ,.!"))
-        print(self.attributes["day"])
+        arr = str.lower().strip("?.!").split(" ")
+
+        assert type(arr) == list
+        self.attributes["day"].parseString(arr)

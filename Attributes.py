@@ -9,7 +9,7 @@ class attributes:
         self.id = id
         self.name = name
 
-#Version 1.0
+#Version 1.1
 class time(attributes):
 
     day = date.today()
@@ -22,39 +22,49 @@ class time(attributes):
         self.error = False
 
     #Search for string that determines day
-    def parseString(self, str):
+    def parseString(self, textStr):
         self.day = date.today()
-        if "today" in str:
-            return
-        elif "tomorrow" in str:
+        if "today" in textStr:
+            textStr.remove("today")
+            return textStr
+        elif "tomorrow" in textStr:
             self.day += timedelta(days = 1)
-        elif "yesterday" in str:
+            textStr.remove("tomorrow")
+            return textStr
+        elif "yesterday" in textStr:
             self.day -= timedelta(days = 1)
-        elif "days" in str:
-            #check for day
-            if "two" in str:
-                coefficient = timedelta(days = 2)
-            elif "three" in str:
-                coefficient = timedelta(days = 3)
-            elif "four" in str:
-                coefficient = timedelta(days = 4)
-            elif "five" in str:
-                coefficient = timedelta(days = 5)
-            elif "six" in str:
-                coefficient = timedelta(days = 6)
-            elif "seven" in str:
-                coefficient = timedelta(days = 7)
-            else:
-                self.error = True
+            textStr.remove("yesterday")
+            return textStr
+        elif "days" in textStr:
+            return self.daysFromToday(textStr)
 
-            #Add or subtract days
-            if not self.error:
-                if "ago" in str:
-                    self.day -= coefficient
-                elif "days from now" in str:
-                    self.day += coefficient
-                else:
-                    self.error = True
+    def daysFromToday(self, textStr):
+        #check for errors
+        assert "days" in textStr
+        index = textStr.index("days")
+        dayNumbers = { "two" : 2,
+                      "three": 3,
+                      "four": 4,
+                      "five": 5,
+                      "six": 6,
+                      "seven": 7 }
+        #assert textStr[index - 1] in dayNumbers, textStr[index - 1]
+        self.day = date.today()
+
+        if "ago" == textStr[index + 1]:
+            self.day -= timedelta(days = dayNumbers[textStr[index - 1]])
+            del textStr[index - 1]
+            textStr.remove("days")
+            textStr.remove("ago")
+            return textStr
+        else:
+            self.day += timedelta(days = dayNumbers[textStr[index - 1]])
+            del textStr[index - 1]
+            textStr.remove("days")
+            textStr.remove("from")
+            textStr.remove("now")
+            return textStr
+
 
 class location(attributes):
     location = ""
